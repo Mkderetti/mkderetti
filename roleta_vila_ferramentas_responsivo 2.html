@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Roleta Vila Ferramentas</title>
+    <style>
+    :root { color-scheme: dark; }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { 
+      margin:0; 
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji','Segoe UI Emoji', 'Segoe UI Symbol'; 
+      background: linear-gradient(135deg,#111827,#0f172a 60%,#0b1220); 
+      color:#fff;
+      overflow-x: hidden;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
+    }
+    .container { 
+      min-height:100vh; 
+      min-height: -webkit-fill-available;
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      padding:12px; 
+    }
+    .card { 
+      width:100%; 
+      max-width:420px; 
+      display:flex; 
+      flex-direction:column; 
+      gap:12px; 
+      align-items:center; 
+    }
+    h1 { 
+      font-weight:800; 
+      font-size:clamp(18px, 5vw, 22px); 
+      text-align:center; 
+      letter-spacing:.5px; 
+      margin:4px 0 8px; 
+    }
+    .wheel-wrap { 
+      position:relative; 
+      width:min(85vw,360px); 
+      height:min(85vw,360px); 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+    }
+    .frame { 
+      position:absolute; 
+      inset:0; 
+      border-radius:999px; 
+      background: radial-gradient(120% 120% at 20% 20%, #f59e0b 0%, #fbbf24 55%, #ca8a04 100%); 
+      box-shadow:0 10px 30px rgba(0,0,0,.5), inset 0 0 0 6px rgba(0,0,0,.25); 
+    }
+    .inner { 
+      position:absolute; 
+      inset:6%; 
+      border-radius:999px; 
+      background:#0b1220; 
+      box-shadow: inset 0 0 30px rgba(0,0,0,.6); 
+    }
+    .wheel { 
+      position:absolute; 
+      inset:12% 12% 12% 12%; 
+      border-radius:999px; 
+      overflow:hidden; 
+    }
+    .logo { 
+      position:absolute; 
+      width:clamp(48px, 15vw, 64px); 
+      height:clamp(48px, 15vw, 64px); 
+      left:50%; 
+      top:50%; 
+      transform:translate(-50%,-50%); 
+      background: linear-gradient(135deg,#f59e0b,#fbbf24); 
+      color:#fff; 
+      border:4px solid #fff; 
+      border-radius:999px; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center; 
+      font-size:clamp(8px, 2.5vw, 10px); 
+      font-weight:800; 
+      text-align:center; 
+      z-index:2; 
+      box-shadow:0 8px 16px rgba(0,0,0,.4); 
+    }
+    .pins { position:absolute; inset:0; }
+    .pin { 
+      position:absolute; 
+      width:clamp(6px, 2.5vw, 10px); 
+      height:clamp(6px, 2.5vw, 10px); 
+      background:#fde047; 
+      border-radius:999px; 
+      box-shadow:0 2px 4px rgba(0,0,0,.4); 
+      left:50%; 
+      top:50%; 
+      transform-origin:center; 
+    }
+    .pointer { 
+      position:absolute; 
+      left:50%; 
+      top:50%; 
+      transform-origin:center; 
+      z-index:3; 
+    }
+    .pointer .shaft { 
+      position:absolute; 
+      left:50%; 
+      transform:translateX(-50%); 
+      background:#dc2626; 
+      border-radius:8px 8px 0 0; 
+      box-shadow:0 8px 16px rgba(0,0,0,.5); 
+    }
+    .pointer .tip { 
+      position:absolute; 
+      left:50%; 
+      transform:translateX(-50%); 
+      width:0; 
+      height:0; 
+      border-left:16px solid transparent; 
+      border-right:16px solid transparent; 
+      border-bottom:24px solid #b91c1c; 
+      filter:drop-shadow(0 6px 10px rgba(0,0,0,.5)); 
+    }
+    .pointer .hub { 
+      position:absolute; 
+      left:50%; 
+      top:50%; 
+      transform:translate(-50%,-50%); 
+      width:clamp(24px, 8vw, 32px); 
+      height:clamp(24px, 8vw, 32px); 
+      background:#dc2626; 
+      border:5px solid #fff; 
+      border-radius:999px; 
+      box-shadow:0 8px 16px rgba(0,0,0,.5); 
+    }
+    .kbd { 
+      width:100%; 
+      background:linear-gradient(160deg,#111827,#0f172a); 
+      border:2px solid #334155; 
+      border-radius:12px; 
+      padding:14px; 
+      box-shadow:0 10px 24px rgba(0,0,0,.35); 
+    }
+    .kbd p { 
+      margin:0 0 10px; 
+      text-align:center; 
+      font-size:clamp(12px, 3.5vw, 14px); 
+      font-weight:600; 
+      color:#e5e7eb; 
+    }
+    .grid { 
+      display:grid; 
+      grid-template-columns:repeat(3,1fr); 
+      gap:10px; 
+    }
+    .btn { 
+      height:clamp(48px, 12vw, 56px); 
+      border:none; 
+      border-radius:10px; 
+      color:#fff; 
+      font-weight:800; 
+      font-size:clamp(12px, 3.5vw, 14px);
+      letter-spacing:.3px; 
+      cursor:pointer; 
+      transition: transform .15s ease, filter .15s ease, box-shadow .15s ease; 
+      box-shadow:0 6px 12px rgba(0,0,0,.35);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+    }
+    .btn:active { 
+      transform:scale(.95); 
+      filter: brightness(1.1);
+    }
+    .btn[disabled] { 
+      opacity:.55; 
+      cursor:not-allowed; 
+    }
+    .ring { 
+      outline:4px solid #fbbf24; 
+      box-shadow:0 0 16px #fbbf24; 
+    }
+    .result { 
+      text-align:center; 
+      font-size:clamp(14px, 4vw, 18px); 
+      margin-top:6px; 
+      min-height:24px; 
+    }
+    .toast { 
+      background:linear-gradient(90deg,#16a34a,#22c55e); 
+      color:#fff; 
+      padding:12px 16px; 
+      border-radius:12px; 
+      box-shadow:0 10px 24px rgba(0,0,0,.35);
+      font-size:clamp(14px, 4vw, 16px);
+    }
+    
+    /* Ajustes para telas muito pequenas */
+    @media (max-height: 600px) {
+      .container { padding: 8px; }
+      .card { gap: 8px; }
+      h1 { margin: 2px 0 4px; }
+    }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+    <div class="card">
+    <h1>🎡 ROLETA VILA FERRAMENTAS</h1>
+    <div class="wheel-wrap" id="wrap">
+    <div class="frame"></div>
+    <div class="inner"></div>
+    <div class="wheel" id="wheel"></div>
+    <div class="logo">VILA<br/>TOOLS</div>
+    <div class="pins" id="pins"></div>
+
+    <!-- Ponteiro -->
+    <div class="pointer" id="pointer" style="transform:translate(-50%,-50%) rotate(0deg)">
+    <div class="shaft" id="shaft"></div>
+    <div class="tip" id="tip"></div>
+    <div class="hub"></div>
+    </div>
+    </div>
+
+    <div class="result" id="result"></div>
+    <div class="toast" id="winToast" style="display:none;">🎉 GANHADOR! 🎉</div>
+
+    <div class="kbd">
+    <p id="status">Escolha uma cor para girar:</p>
+    <div class="grid" id="buttons"></div>
+    </div>
+    </div>
+    </div>
+
+    <script>
+    const colors = [
+    { name: 'Vermelho', hex: '#EF4444' },
+    { name: 'Azul', hex: '#3B82F6' },
+    { name: 'Verde', hex: '#10B981' },
+    { name: 'Amarelo', hex: '#F59E0B' },
+    { name: 'Roxo', hex: '#8B5CF6' },
+    { name: 'Rosa', hex: '#EC4899' }
+    ];
+
+    const wrap = document.getElementById('wrap');
+    const wheel = document.getElementById('wheel');
+    const pins = document.getElementById('pins');
+    const pointer = document.getElementById('pointer');
+    const shaft = document.getElementById('shaft');
+    const tip = document.getElementById('tip');
+    const buttons = document.getElementById('buttons');
+    const statusEl = document.getElementById('status');
+    const resultEl = document.getElementById('result');
+    const winToast = document.getElementById('winToast');
+
+    let spinning = false;
+    let selectedColor = null;
+
+    // Sons com fallback silencioso para mobile
+    const S = {
+    click: 'https://cdn.pixabay.com/download/audio/2021/08/04/audio_12b0c7443c.mp3?filename=click-button-140881.mp3',
+    spin:  'https://cdn.pixabay.com/download/audio/2022/03/15/audio_87bde2b94b.mp3?filename=spinning-wheel-115571.mp3',
+    win:   'https://cdn.pixabay.com/download/audio/2021/08/04/audio_0625c1539c.mp3?filename=success-1-6297.mp3',
+    lose:  'https://cdn.pixabay.com/download/audio/2022/03/15/audio_4e2d1c6b7a.mp3?filename=wrong-answer-126515.mp3'
+    };
+    const playAudio = (url, volume=0.5, loop=false) => { 
+      try {
+        const a=new Audio(url); 
+        a.volume=volume; 
+        a.loop=loop; 
+        a.play().catch(()=>{}); 
+        return a;
+      } catch(e) {
+        return { pause: ()=>{}, currentTime: 0 };
+      }
+    };
+
+    // Desenhar disco fixo (SVG)
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 200 200');
+    svg.style.width = '100%';
+    svg.style.height = '100%';
+
+    const angle = 360 / colors.length; // 60°
+    colors.forEach((color, index) => {
+    const startAngle = index * angle - 90;
+    const endAngle = startAngle + angle;
+    const startRad = (startAngle * Math.PI) / 180;
+    const endRad = (endAngle * Math.PI) / 180;
+
+    const x1 = 100 + 100 * Math.cos(startRad);
+    const y1 = 100 + 100 * Math.sin(startRad);
+    const x2 = 100 + 100 * Math.cos(endRad);
+    const y2 = 100 + 100 * Math.sin(endRad);
+
+    const path = document.createElementNS(svgNS, 'path');
+    path.setAttribute('d', `M 100 100 L ${x1} ${y1} A 100 100 0 0 1 ${x2} ${y2} Z`);
+    path.setAttribute('fill', color.hex);
+    path.setAttribute('stroke', 'white');
+    path.setAttribute('stroke-width', '2');
+    svg.appendChild(path);
+
+    const textAngle = startAngle + angle/2;
+    const textRad = (textAngle * Math.PI)/180;
+    const textX = 100 + 60 * Math.cos(textRad);
+    const textY = 100 + 60 * Math.sin(textRad);
+    const label = document.createElementNS(svgNS, 'text');
+    label.setAttribute('x', textX);
+    label.setAttribute('y', textY);
+    label.setAttribute('fill', 'white');
+    label.setAttribute('font-size', '12');
+    label.setAttribute('font-weight', '800');
+    label.setAttribute('text-anchor', 'middle');
+    label.setAttribute('dominant-baseline', 'middle');
+    label.textContent = color.name.slice(0,4).toUpperCase();
+    svg.appendChild(label);
+    });
+    wheel.appendChild(svg);
+
+    // Pinos decorativos
+    for (let i=0;i<12;i++){
+    const pin = document.createElement('div');
+    pin.className = 'pin';
+    pin.style.transform = `translate(-50%,-50%) rotate(${i*30}deg) translateY(-48%)`;
+    pins.appendChild(pin);
+    }
+
+    // Botões
+    colors.forEach((c) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn';
+    btn.style.background = c.hex;
+    btn.textContent = c.name;
+    btn.addEventListener('click', () => startSpin(c));
+    // Prevenir zoom duplo-toque no iOS
+    btn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      if (!spinning) startSpin(c);
+    });
+    buttons.appendChild(btn);
+    });
+
+    function sizePointer() {
+    const wrapRect = wrap.getBoundingClientRect();
+    const radius = Math.min(wrapRect.width, wrapRect.height) / 2;
+    const innerInset = wrapRect.width * 0.12;
+    const wheelRadius = radius - innerInset;
+    const hubRadius = Math.min(16, wrapRect.width * 0.04);
+    const tipExtra = 8;
+
+    const shaftLength = wheelRadius - hubRadius - 12;
+    const shaftWidth = Math.max(6, Math.round(wheelRadius * 0.06));
+
+    shaft.style.width = shaftWidth + 'px';
+    shaft.style.height = shaftLength + 'px';
+    shaft.style.top = (-shaftLength) + 'px';
+
+    tip.style.borderLeftWidth = Math.max(10, Math.round(shaftWidth*1.6)) + 'px';
+    tip.style.borderRightWidth = Math.max(10, Math.round(shaftWidth*1.6)) + 'px';
+    tip.style.borderBottomWidth = Math.max(16, Math.round(shaftWidth*2.2)) + 'px';
+    tip.style.top = (-shaftLength - parseInt(tip.style.borderBottomWidth) + tipExtra) + 'px';
+    }
+
+    window.addEventListener('resize', sizePointer);
+    window.addEventListener('orientationchange', () => {
+      setTimeout(sizePointer, 100);
+    });
+    sizePointer();
+
+    function startSpin(color) {
+    if (spinning) return;
+    selectedColor = color.name;
+    spinning = true;
+    resultEl.textContent = '';
+    winToast.style.display = 'none';
+    statusEl.textContent = 'Girando... ' + selectedColor;
+
+    // estado visual dos botões
+    ;[...buttons.children].forEach(b=>{
+    b.disabled = true;
+    b.classList.toggle('ring', b.textContent === selectedColor);
+    });
+
+    // sons
+    playAudio(S.click, 0.3);
+    const spinAudio = playAudio(S.spin, 0.4, true);
+
+    const randomIndex = Math.floor(Math.random()*colors.length);
+    const degreesPerSection = 360 / colors.length;
+    const centerOffset = degreesPerSection/2;
+    const targetAngle = (randomIndex * degreesPerSection) + centerOffset;
+    const extraSpins = 6;
+    const finalRotation = (extraSpins*360) + targetAngle;
+
+    pointer.style.transition = 'transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99)';
+    requestAnimationFrame(()=>{
+    pointer.style.transform = `translate(-50%,-50%) rotate(${finalRotation}deg)`;
+    });
+
+    setTimeout(()=>{
+    spinning = false;
+    spinAudio.pause();
+    spinAudio.currentTime = 0;
+
+    const resultColor = colors[randomIndex];
+    resultEl.innerHTML = `Resultado: <strong style="color:${resultColor.hex}">${resultColor.name}</strong>`;
+
+    if (resultColor.name === selectedColor) {
+    playAudio(S.win, 0.6);
+    winToast.style.display = 'inline-block';
+    } else {
+    playAudio(S.lose, 0.4);
+    setTimeout(resetGame, 2000);
+    }
+    }, 4000);
+    }
+
+    function resetGame(){
+    selectedColor = null;
+    statusEl.textContent = 'Escolha uma cor para girar:';
+    ;[...buttons.children].forEach(b=>{ b.disabled = false; b.classList.remove('ring'); });
+    pointer.style.transition = 'none';
+    pointer.style.transform = 'translate(-50%,-50%) rotate(0deg)';
+    }
+    
+    // Prevenir comportamentos indesejados no mobile
+    document.addEventListener('gesturestart', (e) => e.preventDefault());
+    document.addEventListener('gesturechange', (e) => e.preventDefault());
+    document.addEventListener('gestureend', (e) => e.preventDefault());
+    </script>
+  </body>
+</html>
